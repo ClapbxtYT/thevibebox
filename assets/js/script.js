@@ -45,7 +45,23 @@ const musicData = [
   }
 ];
 
+//testing save data for favoriting songs
+var storedItem = localStorage.getItem("storedItem");
 
+function favorite(song_name)
+{
+  alert(song_name);
+}
+function save()
+{
+  var Item = document.getElementById("input").value;
+  localStorage.setItem("storedItem", Item);
+}
+
+function get()
+{
+  localStorage.getItem("storedItem");
+}
 
 /**
  * add eventListnere on all elements that are passed
@@ -70,14 +86,16 @@ const playlist = document.querySelector("[data-music-list]");
 for (let i = 0, len = musicData.length; i < len; i++) {
   playlist.innerHTML += `
   <li>
-    <button class="music-item ${i === 0 ? "playing" : ""}" data-playlist-toggler data-playlist-item="${i}">
+    <div>
+      <span class="material-symbols-rounded" id="star_${musicData[i].title}" onclick="favorite('${musicData[i].title}')">star</span>
+      <button class="music-item ${i === 0 ? "playing" : ""}" data-playlist-toggler data-playlist-item="${i}">
       <img src="${musicData[i].posterUrl}" width="800" height="800" alt="${musicData[i].title} Album Poster"
-        class="img-cover">
-
-      <div class="item-icon">
-        <span class="material-symbols-rounded">equalizer</span>
-      </div>
-    </button>
+      class="img-cover">
+        <div class="item-icon">
+          <span class="material-symbols-rounded">equalizer</span>
+        </div>
+      </button>
+    </div>
   </li>
   `;
 }
@@ -315,50 +333,6 @@ const skipPrev = function () {
 }
 
 playerSkipPrevBtn.addEventListener("click", skipPrev);
-
-
-
-/**
- * SHUFFLE MUSIC
- */
-
-/** get random number for shuffle */
-const getRandomMusic = () => Math.floor(Math.random() * musicData.length);
-
-const shuffleMusic = () => currentMusic = getRandomMusic();
-
-const playerShuffleBtn = document.querySelector("[data-shuffle]");
-let isShuffled = false;
-
-const shuffle = function () {
-  playerShuffleBtn.classList.toggle("active");
-
-  isShuffled = isShuffled ? false : true;
-}
-
-playerShuffleBtn.addEventListener("click", shuffle);
-
-
-
-/**
- * REPEAT MUSIC
- */
-
-const playerRepeatBtn = document.querySelector("[data-repeat]");
-
-const repeat = function () {
-  if (!audioSource.loop) {
-    audioSource.loop = true;
-    this.classList.add("active");
-  } else {
-    audioSource.loop = false;
-    this.classList.remove("active");
-  }
-}
-
-playerRepeatBtn.addEventListener("click", repeat);
-
-
 
 /**
  * MUSIC VOLUME
