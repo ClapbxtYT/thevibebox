@@ -8,6 +8,7 @@
 
 const musicData = [
   {
+    song_num: 0,
     backgroundImage: "./assets/images/cropped-blueboi.jpg",
     posterUrl: "./assets/images/cropped-blueboi.jpg",
     title: "blue boi",
@@ -15,8 +16,10 @@ const musicData = [
     year: 2018,
     artist: "Lakey Inspired",
     musicPath: "./assets/music/blueboi.mp3",
+    favorite: false
   },
   {
+    song_num: 1,
     backgroundImage: "./assets/images/wwwisathing.png",
     posterUrl: "./assets/images/wwwisathing.png",
     title: "www is a thing",
@@ -24,8 +27,10 @@ const musicData = [
     year: 2018,
     artist: "DJ QUads",
     musicPath: "./assets/music/wwwisathing.mp3",
+    favorite: false
   },
   {
+    song_num: 2,
     backgroundImage: "./assets/images/andsoitbegins.jpg",
     posterUrl: "./assets/images/andsoitbegins.jpg",
     title: "And So It Begins",
@@ -33,8 +38,10 @@ const musicData = [
     year: 2016,
     artist: "Artificial Music",
     musicPath: "./assets/music/AndSoItBegins.mp3",
+    favorite: false
   },
   {
+    song_num: 3,
     backgroundImage: "./assets/images/pieces.png",
     posterUrl: "./assets/images/pieces.png",
     title: "Pieces",
@@ -42,26 +49,85 @@ const musicData = [
     year: 2020,
     artist: "After the fall",
     musicPath: "./assets/music/pieces.mp3",
+    favorite: false
   }
 ];
 
 //testing save data for favoriting songs
 var storedItem = localStorage.getItem("storedItem");
 
-function favorite(song_name)
+
+function favorite(song_number)
 {
-  alert(song_name);
-}
-function save()
-{
-  var Item = document.getElementById("input").value;
-  localStorage.setItem("storedItem", Item);
+
+  var isFav = localStorage.getItem(`isFav_song_num_${song_number}`);
+
+  if (isFav == "true") {
+    localStorage.setItem(`isFav_song_num_${song_number}`, "false")
+  } else {
+    localStorage.setItem(`isFav_song_num_${song_number}`, "true")
+  }
+  change_favorite(song_number)
+  favbuttoncheck()
 }
 
-function get()
+function check_favorite(song_number)
 {
-  localStorage.getItem("storedItem");
+  var i = song_number;
+  var isFav = localStorage.getItem(`isFav_song_num_${song_number}`);
+  if (isFav == "true") {
+    playlist.innerHTML += `
+    <li>
+      <div>
+        <div id="icon${musicData[i].song_num}">
+          <span class="material-symbols-rounded" id="star_${musicData[i].song_num}" onclick="favorite('${musicData[i].song_num}')">hotel_class</span>
+        </div>
+        <button class="music-item ${i === 0 ? "playing" : ""}" data-playlist-toggler data-playlist-item="${i}">
+        <img src="${musicData[i].posterUrl}" width="800" height="800" alt="${musicData[i].title} Album Poster"
+        class="img-cover">
+          <div class="item-icon">
+            <span class="material-symbols-rounded">equalizer</span>
+          </div>
+        </button>
+      </div>
+    </li>
+    `;
+  } else {
+    playlist.innerHTML += `
+    <li>
+      <div>
+        <div id="icon${musicData[i].song_num}">
+          <span class="material-symbols-rounded" id="star_${musicData[i].song_num}" onclick="favorite('${musicData[i].song_num}')">star</span>
+        </div>
+        <button class="music-item ${i === 0 ? "playing" : ""}" data-playlist-toggler data-playlist-item="${i}">
+        <img src="${musicData[i].posterUrl}" width="800" height="800" alt="${musicData[i].title} Album Poster"
+        class="img-cover">
+          <div class="item-icon">
+            <span class="material-symbols-rounded">equalizer</span>
+          </div>
+        </button>
+      </div>
+    </li>
+    `;
+  }
 }
+
+function change_favorite(i)
+{
+  var song_number = i
+  var changing_star = document.getElementById(`icon${song_number}`)
+  var isFav = localStorage.getItem(`isFav_song_num_${song_number}`);
+  if (isFav == "true") {
+    changing_star.innerHTML = `
+          <span class="material-symbols-rounded" id="star_${song_number}" onclick="favorite('${song_number}')">hotel_class</span>
+      `;
+  } else {
+    changing_star.innerHTML = `
+          <span class="material-symbols-rounded" id="star_${song_number}" onclick="favorite('${song_number}')">star</span>
+      `;
+  }
+}
+
 
 /**
  * add eventListnere on all elements that are passed
@@ -84,20 +150,8 @@ const addEventOnElements = function (elements, eventType, callback) {
 const playlist = document.querySelector("[data-music-list]");
 
 for (let i = 0, len = musicData.length; i < len; i++) {
-  playlist.innerHTML += `
-  <li>
-    <div>
-      <span class="material-symbols-rounded" id="star_${musicData[i].title}" onclick="favorite('${musicData[i].title}')">star</span>
-      <button class="music-item ${i === 0 ? "playing" : ""}" data-playlist-toggler data-playlist-item="${i}">
-      <img src="${musicData[i].posterUrl}" width="800" height="800" alt="${musicData[i].title} Album Poster"
-      class="img-cover">
-        <div class="item-icon">
-          <span class="material-symbols-rounded">equalizer</span>
-        </div>
-      </button>
-    </div>
-  </li>
-  `;
+  var num = i;
+  check_favorite(num);
 }
 
 
@@ -138,15 +192,15 @@ let lastPlayedMusic = 0;
 const changePlaylistItem = function () {
   playlistItems[lastPlayedMusic].classList.remove("playing");
   playlistItems[currentMusic].classList.add("playing");
+  favbuttoncheck()
 }
 
 addEventOnElements(playlistItems, "click", function () {
   lastPlayedMusic = currentMusic;
   currentMusic = Number(this.dataset.playlistItem);
   changePlaylistItem();
+
 });
-
-
 
 /**
  * PLAYER
@@ -175,8 +229,30 @@ const changePlayerInfo = function () {
 
   audioSource.addEventListener("loadeddata", updateDuration);
   playMusic();
-}
 
+  
+}
+favbuttoncheck()
+function favbuttoncheck() {
+  var isFav = localStorage.getItem(`isFav_song_num_${musicData[currentMusic].song_num}`);
+    if (isFav == "true") {
+      document.querySelector("[favbutton]").innerHTML = `
+      <div>
+        <button class="btn-icon" onclick="favorite('${musicData[currentMusic].song_num}')">
+          <span class="material-symbols-rounded default-icon">hotel_class</span>
+        </button>
+        </div>
+        `;
+    } else {
+      document.querySelector("[favbutton]").innerHTML = `
+      <div>
+        <button class="btn-icon" onclick="favorite('${musicData[currentMusic].song_num}')">
+          <span class="material-symbols-rounded default-icon">star</span>
+        </button>
+        </div>
+        `;
+    }
+}
 addEventOnElements(playlistItems, "click", changePlayerInfo);
 
 /** update player duration */
@@ -373,3 +449,4 @@ const muteVolume = function () {
 }
 
 playerVolumeBtn.addEventListener("click", muteVolume);
+
