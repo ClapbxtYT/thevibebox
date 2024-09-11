@@ -63,7 +63,11 @@ Select or favorite any song.
 
 *elements of this description may be created with the help of ChatGPT
 
+Original code source here
 
+https://github.com/codewithsadee/music-player
+
+Favoriting system and songs were added by ME
 
 
 
