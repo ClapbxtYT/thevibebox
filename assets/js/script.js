@@ -1,7 +1,6 @@
 'use strict';
 
 
-
 /**
  * all music information
  */
@@ -53,8 +52,6 @@ const musicData = [
   }
 ];
 
-//testing save data for favoriting songs
-var storedItem = localStorage.getItem("storedItem");
 
 
 function favorite(song_number)
@@ -80,7 +77,7 @@ function check_favorite(song_number)
     <li>
       <div>
         <div id="icon${musicData[i].song_num}">
-          <span class="material-symbols-rounded" id="star_${musicData[i].song_num}" onclick="favorite('${musicData[i].song_num}')">hotel_class</span>
+          <span class="material-symbols-rounded filledin" id="star_${musicData[i].song_num}" onclick="favorite('${musicData[i].song_num}')">star</span>
         </div>
         <button class="music-item ${i === 0 ? "playing" : ""}" data-playlist-toggler data-playlist-item="${i}">
         <img src="${musicData[i].posterUrl}" width="800" height="800" alt="${musicData[i].title} Album Poster"
@@ -119,7 +116,7 @@ function change_favorite(i)
   var isFav = localStorage.getItem(`isFav_song_num_${song_number}`);
   if (isFav == "true") {
     changing_star.innerHTML = `
-          <span class="material-symbols-rounded" id="star_${song_number}" onclick="favorite('${song_number}')">hotel_class</span>
+          <span class="material-symbols-rounded filledin" id="star_${song_number}" onclick="favorite('${song_number}')">star</span>
       `;
   } else {
     changing_star.innerHTML = `
@@ -232,6 +229,35 @@ const changePlayerInfo = function () {
 
   
 }
+
+
+
+
+doShuffleIcon()
+
+function doShuffleIcon () {
+  var doShuffleFav = localStorage.getItem("doShuffleFav");
+  if (doShuffleFav == "1") {
+    localStorage.setItem("doShuffleFav", "1")
+    document.getElementById("shufflefav").innerHTML = `
+    <span class="material-symbols-rounded"onclick="shufflefav()">shuffle_on</span>
+  `;
+  } else {
+    localStorage.setItem("doShuffleFav", "0")
+    document.getElementById("shufflefav").innerHTML = `
+    <span class="material-symbols-rounded"onclick="shufflefav()">shuffle</span>
+  `;
+  }
+}
+function shufflefav() {
+  if (localStorage.getItem("doShuffleFav") == "1") {
+    localStorage.setItem("doShuffleFav", "0")
+  } else {
+    localStorage.setItem("doShuffleFav", "1")
+  }
+  doShuffleIcon()
+}
+
 favbuttoncheck()
 function favbuttoncheck() {
   var isFav = localStorage.getItem(`isFav_song_num_${musicData[currentMusic].song_num}`);
@@ -239,7 +265,7 @@ function favbuttoncheck() {
       document.querySelector("[favbutton]").innerHTML = `
       <div>
         <button class="btn-icon" onclick="favorite('${musicData[currentMusic].song_num}')">
-          <span class="material-symbols-rounded default-icon">hotel_class</span>
+          <span class="material-symbols-rounded filledin default-icon">star</span>
         </button>
         </div>
         `;
@@ -361,6 +387,9 @@ const isMusicEnd = function () {
     playerSeekRange.value = audioSource.currentTime;
     playerRunningTime.textContent = getTimecode(audioSource.currentTime);
     updateRangeFill();
+    skipNext();
+    changePlayerInfo();
+    changePlaylistItem();
   }
 }
 
@@ -373,17 +402,22 @@ const isMusicEnd = function () {
 const playerSkipNextBtn = document.querySelector("[data-skip-next]");
 
 const skipNext = function () {
+
   lastPlayedMusic = currentMusic;
-
-  if (isShuffled) {
-    shuffleMusic();
-  } else {
-    currentMusic >= musicData.length - 1 ? currentMusic = 0 : currentMusic++;
-  }
-
+  
+  currentMusic >= musicData.length - 1 ? currentMusic = 0 : currentMusic++;
   changePlayerInfo();
   changePlaylistItem();
+  
+  if (localStorage.getItem("doShuffleFav") == true)
+  {
+    if (localStorage.getItem(`isFav_song_num_${currentMusic}`) != "true") {
+      skipNext()
+    }
+  }
 }
+
+
 
 playerSkipNextBtn.addEventListener("click", skipNext);
 
@@ -398,11 +432,7 @@ const playerSkipPrevBtn = document.querySelector("[data-skip-prev]");
 const skipPrev = function () {
   lastPlayedMusic = currentMusic;
 
-  if (isShuffled) {
-    shuffleMusic();
-  } else {
-    currentMusic <= 0 ? currentMusic = musicData.length - 1 : currentMusic--;
-  }
+  currentMusic <= 0 ? currentMusic = musicData.length - 1 : currentMusic--;
 
   changePlayerInfo();
   changePlaylistItem();
