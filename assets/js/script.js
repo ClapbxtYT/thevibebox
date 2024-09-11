@@ -49,6 +49,17 @@ const musicData = [
     artist: "After the fall",
     musicPath: "./assets/music/pieces.mp3",
     favorite: false
+  },
+  {
+    song_num: 4,
+    backgroundImage: "./assets/images/lofi-orchestra.png",
+    posterUrl: "./assets/images/lofi-orchestra.png",
+    title: "Lofi Orchestra",
+    album: "Lofi Orchestra",
+    year: 2023,
+    artist: "xethrocc",
+    musicPath: "./assets/music/lofi-orchestra.mp3",
+    favorite: false
   }
 ];
 
